@@ -1,17 +1,17 @@
-import express, { Request, Response } from 'express';
+import { UpdateBalanceController } from './Infra/Controller/UpdateBalanceController';
+import { KafkaQueueConsumerAdapter } from './Infra/Queue/KafkaQueueConsumerAdapter';
+import { MysqlConnectionAdapter } from './Infra/Database/MysqlConnectionAdapter';
+import { AccountBalanceRepositoryDatabase } from './Infra/Repository/AccountBalanceRepositoryDatabase';
+import { ExpressHttpAdapter } from './Infra/Http/ExpressHttpAdapter';
+import { GetAccountBalanceController } from './Infra/Controller/GetBalanceController';
 
+const server = new ExpressHttpAdapter();
 
-const app = express();
+const consumer = new KafkaQueueConsumerAdapter();
+const connection = new MysqlConnectionAdapter("mysql://root:root@mysql:3306/balances");
+const accountBalanceRepository = new AccountBalanceRepositoryDatabase(connection);
 
+new UpdateBalanceController(consumer, accountBalanceRepository);
+new GetAccountBalanceController(server, accountBalanceRepository);
 
-app.use(express.json());
-
-app.get("/", (req: Request, res: Response) => {
-    res.status(200);
-    return res.json({ message: "Hello, World" });
-});
-
-
-app.listen(3003, () => {
-    console.log("balances service is running");
-});
+server.listen(3003);
