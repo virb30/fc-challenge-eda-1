@@ -12,6 +12,6 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 
-app.listen(3001, () => {
-    console.log("service is running");
+app.listen(3003, () => {
+    console.log("balances service is running");
 });
